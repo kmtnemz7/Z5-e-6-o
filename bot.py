@@ -2,7 +2,7 @@ import os
 from telethon import TelegramClient, events
 
 api_id = int(os.getenv("API_ID"))
-api_hash = os.getenv("API_HASH"))
+api_hash = os.getenv("API_HASH")
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 SOURCE_GROUP = os.getenv("BACKEND_GROUP", "zeropingphan")
@@ -24,3 +24,4 @@ async def handle(event):
     )
 
 bot.run_until_disconnected()
+
