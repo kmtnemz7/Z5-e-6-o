@@ -14,7 +14,7 @@ bot = TelegramClient("zeroping_bot", api_id, api_hash).start(bot_token=BOT_TOKEN
 @bot.on(events.NewMessage(chats="SOURCE_GROUP"))
 async def handle(event):
     # Filter: only messages from PhanesBot
-    if not event.sender or event.sender.username != "PhanesBot":
+    if not event.sender or event.sender.username != "PhanesGoldBot":
         return
 
     msg = event.message
