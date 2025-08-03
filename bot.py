@@ -1,14 +1,12 @@
 import os
 from telethon import TelegramClient, events
-from dotenv import load_dotenv
-
-load_dotenv()
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 SOURCE_GROUP = os.getenv("BACKEND_GROUP", "BACKENDZEROPINGxc_vy")
 TARGET_GROUP = os.getenv("FRONTEND_GROUP", "ZeroPingX")
 
-bot = TelegramClient("zeroping_bot", BOT_TOKEN=BOT_TOKEN)
+# ✅ Correct way to init bot client
+bot = TelegramClient("zeroping_bot").start(bot_token=BOT_TOKEN)
 
 @bot.on(events.NewMessage(chats=SOURCE_GROUP))
 async def relay(event):
@@ -22,7 +20,4 @@ async def relay(event):
     except Exception as e:
         print(f"❌ Relay failed: {e}")
 
-bot.start()
 bot.run_until_disconnected()
-
-
