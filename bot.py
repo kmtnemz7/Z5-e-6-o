@@ -22,9 +22,7 @@ async def handle(event):
         msg.raw_text,
         formatting_entities=msg.entities
     )
-  # or "MarkdownV2" if needed
-    )
-
 bot.run_until_disconnected()
+
 
 
