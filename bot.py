@@ -13,7 +13,6 @@ bot = TelegramClient("zeroping_bot", api_id, api_hash).start(bot_token=BOT_TOKEN
 
 @bot.on(events.NewMessage(chats=SOURCE_GROUP))
 async def handle(event):
-    # Filter: only messages from PhanesGoldBot
     if not event.sender or event.sender.username != "PhanesGoldBot":
         return
 
@@ -21,20 +20,24 @@ async def handle(event):
     if not msg.text:
         return
 
-    # Split before "DEF"
     full_text = msg.text
     if "DEF" in full_text:
-        trimmed = full_text.split("DEF")[0].strip()
-        if trimmed:
-            await bot.send_message(
-                TARGET_GROUP,
-                trimmed,
-                formatting_entities=msg.entities
-            )
-            print("✅ Sent text before DEF")
-        else:
-            print("⚠️ Trimmed message was empty")
+        cutoff_index = full_text.find("DEF")
+        trimmed_text = full_text[:cutoff_index].strip()
+
+        # Filter entities that fall within trimmed range
+        safe_entities = [
+            e for e in msg.entities or []
+            if e.offset < cutoff_index
+        ]
+
+        await bot.send_message(
+            TARGET_GROUP,
+            trimmed_text,
+            formatting_entities=safe_entities
+        )
+        print("✅ Sent trimmed message with formatting")
     else:
-        print("⚠️ Skipped: 'DEF' not in message")
+        print("⚠️ Skipped: 'DEF' not found")
 
 bot.run_until_disconnected()
