@@ -8,7 +8,7 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 SOURCE_GROUP = os.getenv("BACKEND_GROUP", "BACKENDZEROPINGxc_vy")
 TARGET_GROUP = os.getenv("FRONTEND_GROUP", "ZeroPingX")
 
-bot = TelegramClient("zeroping_bot", bot_token=bot_token)
+bot = TelegramClient("zeroping_bot", BOT_TOKEN=BOT_TOKEN)
 
 @bot.on(events.NewMessage(chats=SOURCE_GROUP))
 async def relay(event):
@@ -24,4 +24,5 @@ async def relay(event):
 
 bot.start()
 bot.run_until_disconnected()
+
 
