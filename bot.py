@@ -14,13 +14,17 @@ bot = TelegramClient("zeroping_bot", api_id, api_hash).start(bot_token=BOT_TOKEN
 from telethon import events
 
 # Main handler
+
 @bot.on(events.NewMessage(chats=SOURCE_GROUP))
 async def handle(event):
-    msg = event.message
     sender = await event.get_sender()
+    if sender and sender.is_self:
+        return  # ✅ Don't process own messages
+
+    msg = event.message
     username = sender.username if sender else "Unknown"
 
-    # ✅ Debug log for every message
+    # Log who sent the message
     await bot.send_message(SOURCE_GROUP, f"👀 From: {username}\n📝 {msg.raw_text[:100] if msg and msg.raw_text else '[No text]'}")
 
     if not msg or not msg.text:
@@ -32,7 +36,7 @@ async def handle(event):
         cutoff_index = full_text.find("DEF")
         trimmed_text = full_text[:cutoff_index].strip()
 
-        # Filter entities that fall within trimmed range
+        # Filter entities within range
         safe_entities = [
             e for e in msg.entities or []
             if e.offset < cutoff_index
@@ -51,7 +55,10 @@ async def handle(event):
 # 🔍 Step 1: Catch raw events (optional — catches messages that bypass NewMessage)
 @bot.on(events.Raw)
 async def catch_raw(event):
-    await bot.send_message(SOURCE_GROUP, f"📦 Raw event caught: {type(event).__name__}")
+    # Skip if it's something the bot itself just sent
+    if hasattr(event, 'message') and getattr(event.message, 'out', False):
+        return
 
+    await bot.send_message(SOURCE_GROUP, f"📦 Raw event caught: {type(event).__name__}")
 
 bot.run_until_disconnected()
