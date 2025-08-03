@@ -15,7 +15,7 @@ from telethon import events
 
 # Main handler
 
-@client.on(events.NewMessage(chats="SOURCE_GROUP"))
+@bot.on(events.NewMessage(chats="SOURCE_GROUP"))
 async def handle(event):
     msg = event.message
     if not msg or not msg.text:
@@ -41,4 +41,5 @@ async def handle(event):
         
 
 bot.run_until_disconnected()
+
 
