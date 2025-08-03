@@ -21,25 +21,17 @@ async def handle(event):
     if not msg or not msg.text:
         return
 
-    full_text = msg.text
+    await client.send_message(
+        "TARGET_GROUP",
+        msg.text,
+        parse_mode="md"  # or "MarkdownV2" if needed
+    )
 
-    if "DEF" in full_text:
-        cutoff_index = full_text.find("DEF")
-        trimmed_text = full_text[:cutoff_index].strip()
 
-        safe_entities = [
-            e for e in msg.entities or []
-            if e.offset < cutoff_index
-        ]
-
-        await client.send_message(
-            "TARGET_GROUP",
-            trimmed_text,
-            formatting_entities=safe_entities
-        )
         
         
 
 bot.run_until_disconnected()
+
 
 
