@@ -13,11 +13,9 @@ bot = TelegramClient("zeroping_bot", api_id, api_hash).start(bot_token=BOT_TOKEN
 
 @bot.on(events.NewMessage(chats=SOURCE_GROUP))
 async def handle(event):
-    if not event.sender or event.sender.username != "PhanesGoldBot":
-        return
-
     msg = event.message
-    if not msg.text:
+    if not msg or not msg.text:
+        await bot.send_message(SOURCE_GROUP, "⚠️ Skipped: No message text")
         return
 
     full_text = msg.text
@@ -36,8 +34,10 @@ async def handle(event):
             trimmed_text,
             formatting_entities=safe_entities
         )
-        print("✅ Sent trimmed message with formatting")
+
+        await bot.send_message(SOURCE_GROUP, "✅ Sent trimmed message with formatting")
     else:
-        print("⚠️ Skipped: 'DEF' not found")
+        await bot.send_message(SOURCE_GROUP, "⚠️ Skipped: 'DEF' not found in message")
+
 
 bot.run_until_disconnected()
