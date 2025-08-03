@@ -26,12 +26,4 @@ async def handle(event):
         msg.text,
         parse_mode="md"  # or "MarkdownV2" if needed
     )
-
-
-        
-        
-
 bot.run_until_disconnected()
-
-
-
