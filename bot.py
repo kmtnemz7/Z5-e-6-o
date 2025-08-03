@@ -11,16 +11,26 @@ TARGET_GROUP = os.getenv("FRONTEND_GROUP", "ZeroPingX")
 # ✅ Correct way to init bot client
 bot = TelegramClient("zeroping_bot", api_id, api_hash).start(bot_token=BOT_TOKEN)
 
-@bot.on(events.NewMessage(chats=SOURCE_GROUP))
-async def relay(event):
-    try:
-        msg = event.message
-        if msg.raw_text:
-            await bot.send_message(TARGET_GROUP, msg.raw_text, parse_mode="Markdown")
-            print("✅ Relayed message.")
+@bot.on(events.NewMessage(chats="SOURCE_GROUP"))
+async def handle(event):
+    # Filter: only messages from PhanesBot
+    if not event.sender or event.sender.username != "PhanesBot":
+        return
+
+    msg = event.message
+    if not msg.raw_text:
+        return
+
+    # Split before "DEF"
+    full_text = msg.raw_text
+    if "DEF" in full_text:
+        trimmed = full_text.split("DEF")[0].strip()
+        if trimmed:
+            await bot.send_message("TargetChannel", trimmed)
+            print("✅ Sent text before DEF")
         else:
-            print("⚠️ Skipped non-text message.")
-    except Exception as e:
-        print(f"❌ Relay failed: {e}")
+            print("⚠️ Trimmed message was empty")
+    else:
+        print("⚠️ Skipped: 'DEF' not in message")
 
 bot.run_until_disconnected()
