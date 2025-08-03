@@ -11,9 +11,18 @@ TARGET_GROUP = os.getenv("FRONTEND_GROUP", "ZeroPingX")
 # ✅ Correct way to init bot client
 bot = TelegramClient("zeroping_bot", api_id, api_hash).start(bot_token=BOT_TOKEN)
 
+from telethon import events
+
+# Main handler
 @bot.on(events.NewMessage(chats=SOURCE_GROUP))
 async def handle(event):
     msg = event.message
+    sender = await event.get_sender()
+    username = sender.username if sender else "Unknown"
+
+    # ✅ Debug log for every message
+    await bot.send_message(SOURCE_GROUP, f"👀 From: {username}\n📝 {msg.raw_text[:100] if msg and msg.raw_text else '[No text]'}")
+
     if not msg or not msg.text:
         await bot.send_message(SOURCE_GROUP, "⚠️ Skipped: No message text")
         return
@@ -38,6 +47,11 @@ async def handle(event):
         await bot.send_message(SOURCE_GROUP, "✅ Sent trimmed message with formatting")
     else:
         await bot.send_message(SOURCE_GROUP, "⚠️ Skipped: 'DEF' not found in message")
+
+# 🔍 Step 1: Catch raw events (optional — catches messages that bypass NewMessage)
+@bot.on(events.Raw)
+async def catch_raw(event):
+    await bot.send_message(SOURCE_GROUP, f"📦 Raw event caught: {type(event).__name__}")
 
 
 bot.run_until_disconnected()
