@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-bot_token = os.getenv("BOT_TOKEN")
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 SOURCE_GROUP = os.getenv("BACKEND_GROUP", "BACKENDZEROPINGxc_vy")
 TARGET_GROUP = os.getenv("FRONTEND_GROUP", "ZeroPingX")
 
@@ -24,3 +24,4 @@ async def relay(event):
 
 bot.start()
 bot.run_until_disconnected()
+
