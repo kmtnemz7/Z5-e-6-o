@@ -17,16 +17,7 @@ from telethon import events
 
 @bot.on(events.NewMessage(chats=SOURCE_GROUP))
 async def handle(event):
-    sender = await event.get_sender()
-    if sender and sender.is_self:
-        return  # ✅ Don't process own messages
-
     msg = event.message
-    username = sender.username if sender else "Unknown"
-
-    # Log who sent the message
-    await bot.send_message(SOURCE_GROUP, f"👀 From: {username}\n📝 {msg.raw_text[:100] if msg and msg.raw_text else '[No text]'}")
-
     if not msg or not msg.text:
         await bot.send_message(SOURCE_GROUP, "⚠️ Skipped: No message text")
         return
@@ -36,7 +27,7 @@ async def handle(event):
         cutoff_index = full_text.find("DEF")
         trimmed_text = full_text[:cutoff_index].strip()
 
-        # Filter entities within range
+        # Filter entities that fall within trimmed range
         safe_entities = [
             e for e in msg.entities or []
             if e.offset < cutoff_index
@@ -51,14 +42,5 @@ async def handle(event):
         await bot.send_message(SOURCE_GROUP, "✅ Sent trimmed message with formatting")
     else:
         await bot.send_message(SOURCE_GROUP, "⚠️ Skipped: 'DEF' not found in message")
-
-# 🔍 Step 1: Catch raw events (optional — catches messages that bypass NewMessage)
-@bot.on(events.Raw)
-async def catch_raw(event):
-    # Skip if it's something the bot itself just sent
-    if hasattr(event, 'message') and getattr(event.message, 'out', False):
-        return
-
-    await bot.send_message(SOURCE_GROUP, f"📦 Raw event caught: {type(event).__name__}")
 
 bot.run_until_disconnected()
