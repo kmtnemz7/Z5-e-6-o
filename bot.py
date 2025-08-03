@@ -1,5 +1,6 @@
 import os
 from telethon import TelegramClient, events
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -23,4 +24,5 @@ async def relay(event):
 
 bot.start()
 bot.run_until_disconnected()
+
 
