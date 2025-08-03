@@ -11,18 +11,25 @@ TARGET_GROUP = os.getenv("FRONTEND_GROUP", "ZeroPingX")
 # Init bot client
 bot = TelegramClient("zeroping_bot", api_id, api_hash).start(bot_token=BOT_TOKEN)
 
-@bot.on(events.NewMessage(chats=SOURCE_GROUP))
+@bot.on(events.NewMessage(chats="BACKENDZEROPINGxc_vy"))
 async def handle(event):
     msg = event.message
     if not msg or not msg.text:
         return
 
+    full_text = msg.text
+    trimmed_text = full_text.strip()
+
+    # Keep all formatting entities safely
+    safe_entities = msg.entities or []
+
     await bot.send_message(
-        TARGET_GROUP,
-        msg.raw_text,
-        formatting_entities=msg.entities
+        "zeropingphane",
+        trimmed_text,
+        formatting_entities=safe_entities
     )
 bot.run_until_disconnected()
+
 
 
 
