@@ -15,23 +15,30 @@ from telethon import events
 
 # Main handler
 
-@bot.on(events.NewMessage(chats=SOURCE_GROUP))
+@client.on(events.NewMessage(chats="SOURCE_GROUP"))
 async def handle(event):
     msg = event.message
     if not msg or not msg.text:
-        await bot.send_message(SOURCE_GROUP, "⚠️ Skipped: No message text")
         return
 
-    try:
-        await bot.send_message(
-            TARGET_GROUP,
-            msg.text,
-            parse_mode="md"  # or "MarkdownV2" if needed
+    full_text = msg.text
+
+    if "DEF" in full_text:
+        cutoff_index = full_text.find("DEF")
+        trimmed_text = full_text[:cutoff_index].strip()
+
+        safe_entities = [
+            e for e in msg.entities or []
+            if e.offset < cutoff_index
+        ]
+
+        await client.send_message(
+            "TARGET_GROUP",
+            trimmed_text,
+            formatting_entities=safe_entities
         )
-        await bot.send_message(SOURCE_GROUP, "✅ Relayed message with formatting")
-    except Exception as e:
-        await bot.send_message(SOURCE_GROUP, f"❌ Failed to send message: {e}")
         
         
 
 bot.run_until_disconnected()
+
