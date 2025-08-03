@@ -22,25 +22,16 @@ async def handle(event):
         await bot.send_message(SOURCE_GROUP, "⚠️ Skipped: No message text")
         return
 
-    full_text = msg.text
-    if "DEF" in full_text:
-        cutoff_index = full_text.find("DEF")
-        trimmed_text = full_text[:cutoff_index].strip()
-
-        # Filter entities that fall within trimmed range
-        safe_entities = [
-            e for e in msg.entities or []
-            if e.offset < cutoff_index
-        ]
-
+    try:
         await bot.send_message(
             TARGET_GROUP,
-            trimmed_text,
-            formatting_entities=safe_entities
+            msg.text,
+            parse_mode="md"  # or "MarkdownV2" if needed
         )
-
-        await bot.send_message(SOURCE_GROUP, "✅ Sent trimmed message with formatting")
-    else:
-        await bot.send_message(SOURCE_GROUP, "⚠️ Skipped: 'DEF' not found in message")
+        await bot.send_message(SOURCE_GROUP, "✅ Relayed message with formatting")
+    except Exception as e:
+        await bot.send_message(SOURCE_GROUP, f"❌ Failed to send message: {e}")
+        
+        
 
 bot.run_until_disconnected()
