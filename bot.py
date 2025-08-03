@@ -24,5 +24,3 @@ async def relay(event):
 
 bot.start()
 bot.run_until_disconnected()
-
-
