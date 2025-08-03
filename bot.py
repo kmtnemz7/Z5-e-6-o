@@ -15,15 +15,16 @@ from telethon import events
 
 # Main handler
 
-@bot.on(events.NewMessage(chats="SOURCE_GROUP"))
+@bot.on(events.NewMessage(chats=SOURCE_GROUP))
 async def handle(event):
     msg = event.message
     if not msg or not msg.text:
         return
 
     await client.send_message(
-        "TARGET_GROUP",
+        TARGET_GROUP,
         msg.text,
         parse_mode="md"  # or "MarkdownV2" if needed
     )
 bot.run_until_disconnected()
+
