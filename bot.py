@@ -64,9 +64,8 @@ async def relay_and_format(event):
     f"📈 MC: {f['mc']}\n"
     f"💧 Vol: {f['vol']}\n"
     f"⏱️ Seen: {f['seen']}"
-    f"\n\n"
+    f"\n |\n |"
     # ──────────────────────────────────────────────
-    f"⤵️\n\n"
 
     f"⚖️ <b>DEX:</b> <a href='https://raydium.io'>{f['dex']}</a> | Paid: {f['dex_paid']}\n"
     f"👥 <b>Holder:</b> {f['holder']}\n"
