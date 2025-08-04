@@ -4,6 +4,7 @@ import asyncio, re
 SOURCE_GROUP  = "BACKENDZEROPINGxc_vy"   # where scraper forwards raw pings
 TARGET_GROUP  = "ZeroPingX"              # final public group or channel
 
+bot = TelegramClient("zeroping_bot", api_id, api_hash)
 
 def extract_fields(text: str):
     """Return dict with all the values we care about."""
@@ -71,3 +72,4 @@ async def relay_and_format(event):
         await relay_and_format(event)
     except Exception as err:
         print("❌ formatting bot error:", err)
+
