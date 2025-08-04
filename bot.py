@@ -13,6 +13,16 @@ bot = TelegramClient("zeroping_bot", api_id, api_hash).start(bot_token=BOT_TOKEN
 
 @bot.on(events.NewMessage(chats="zeropingphane"))
 async def handle(event):
-    await bot.forward_messages("ZeroPingX", event.message)
+    try:
+        msg = event.message
+        # Copy text, media, and formatting
+        await bot.send_message(
+            "ZeroPingX",
+            msg.text or "",  # Use empty string if no text
+            file=msg.media,  # Include media (e.g., images, videos)
+            formatting_entities=msg.entities or []  # Preserve formatting
+        )
+    except Exception as e:
+        print(f"Error sending to ZeroPingX: {e}")
 
 bot.run_until_disconnected()
