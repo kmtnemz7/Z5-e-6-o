@@ -35,19 +35,22 @@ async def handle(event):
 
         await bot.send_message(
             TARGET_GROUP,
-            message=msg.raw_text or "",
+            message=msg.text or msg.raw_text or "",
             file=msg.media if msg.media else None,
-            parse_mode=None  # Avoid formatting issues
+            formatting_entities=msg.entities if msg.entities else None
         )
 
     except FloodWaitError as e:
         await asyncio.sleep(e.seconds + 1)
         await bot.send_message(
             TARGET_GROUP,
-            message=msg.raw_text or "",
+            message=msg.text or msg.raw_text or "",
             file=msg.media if msg.media else None,
-            parse_mode=None
+            formatting_entities=msg.entities if msg.entities else None
         )
+
+    except Exception as e:
+        print("❌ BOT FORWARD ERROR:", e)
 
 async def main():
     if await start_with_retry(bot, BOT_TOKEN):
@@ -58,6 +61,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
