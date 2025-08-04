@@ -2,6 +2,7 @@ import os
 import asyncio
 from telethon import TelegramClient, events
 from telethon.errors import FloodWaitError
+from telethon.tl.types import MessageMediaWebPage
 
 api_id = int(os.getenv("API_ID"))
 api_hash = os.getenv("API_HASH")
@@ -27,12 +28,19 @@ bot = TelegramClient("zeroping_bot", api_id, api_hash)
 @bot.on(events.NewMessage(chats=SOURCE_GROUP))
 async def handle(event):
     msg = event.message
-    await bot.send_message(
-        TARGET_GROUP,
-        msg.text or "",
-        file=msg.media,
-        parse_mode="md"
-    )
+    if isinstance(msg.media, MessageMediaWebPage):
+        await bot.send_message(
+            TARGET_GROUP,
+            msg.text or "",
+            parse_mode="md"
+        )
+    else:
+        await bot.send_message(
+            TARGET_GROUP,
+            msg.text or "",
+            file=msg.media,
+            parse_mode="md"
+        )
 
 async def main():
     if await start_with_retry(bot, BOT_TOKEN):
