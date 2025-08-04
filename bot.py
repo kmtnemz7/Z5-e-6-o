@@ -1,6 +1,6 @@
 import os, asyncio, re
 from telethon import TelegramClient, events, errors
-from html import escape
+from html import escape as h
 
 # ── 1. Settings ────────────────────────────────
 api_id     = int(os.getenv("API_ID"))
@@ -47,30 +47,46 @@ async def relay_and_format(event):
             return
 
         f = extract_fields(raw)
+for k in f:                          # HTML-escape dynamic text
+    f[k] = h(f[k])
 
-        # HTML-escape any user/dynamic content
-        for k in f:
-            f[k] = escape(f[k])
+msg = (
+    # Header (DexScreener link)
+    f"💊&nbsp;&nbsp;<b><a href='https://dexscreener.com/solana/{f['token']}'>{f['name']}</a></b>\n"
 
-        msg = (
-            f"💊 <b><a href='https://dexscreener.com/solana/{f['token']}'>{f['name']}</a></b>\n"
-            f"└ CA: <code><a href='https://solscan.io/token/{f['token']}'>{f['token']}</a></code>\n  |\n"
-            f"💵 <b>Price:</b>    {f['usd']}\n"
-            f"📈 <b>MC:</b>       {f['mc']}\n"
-            f"💧 <b>Vol:</b>       {f['vol']}\n"
-            f"⏱️ <b>Seen:</b>     {f['seen']}\n  |\n"
-            f"⚖️ <b>DEX:</b> <a href='https://raydium.io'>{f['dex']}</a> | Paid: {f['dex_paid']}\n"
-            f"👥 <b>Holder:</b> {f['holder']}\n"
-            f"🔝 <b>TH:</b> {f['th']}\n\n\n"
-            f"🔬 Deep analysis by <a href='https://t.me/ZeroPingX_bot'>ZeroPing</a> | our AI-powered pattern recognition bot.\n\n"
-            f"<b><a href='https://axiom.trade/@kmtz'>🔼 Quick trade on AXIOM!</a></b>"
-        )
+    # Contract
+    f"╰─🧬&nbsp;CA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→&nbsp;"
+    f"<code><a href='https://solscan.io/token/{f['token']}'>{f['token']}</a></code>\n"
+    f"&nbsp;&nbsp;&nbsp;│\n"
 
-        await bot.send_message(
-            TARGET_GROUP,
-            msg,
-            parse_mode="HTML",
-            link_preview=False      # still hides Solscan cards
+    # Core stats (one per line, vertically aligned via non-breaking spaces)
+    f"&nbsp;&nbsp;&nbsp;💵&nbsp;Price&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→&nbsp;{f['usd']}\n"
+    f"&nbsp;&nbsp;&nbsp;📈&nbsp;MC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→&nbsp;{f['mc']}\n"
+    f"&nbsp;&nbsp;&nbsp;💧&nbsp;Volume&nbsp;&nbsp;&nbsp;→&nbsp;{f['vol']}\n"
+    f"&nbsp;&nbsp;&nbsp;⏱️&nbsp;&nbsp;Last&nbsp;Seen&nbsp;→&nbsp;{f['seen']}\n"
+    f"&nbsp;&nbsp;&nbsp;│\n"
+
+    # Liquidity / holders
+    f"&nbsp;&nbsp;&nbsp;⚖️&nbsp;DEX&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→&nbsp;"
+    f"<a href='https://raydium.io'>{f['dex']}</a>&nbsp;&nbsp;|&nbsp;Paid&nbsp;{f['dex_paid']}\n"
+    f"&nbsp;&nbsp;&nbsp;👥&nbsp;Holders&nbsp;&nbsp;&nbsp;→&nbsp;{f['holder']}\n"
+    f"&nbsp;&nbsp;&nbsp;🔝&nbsp;TH&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→&nbsp;{f['th']}\n"
+
+    "────────────────────────────────────────────────────────\n"
+
+    # Brand line & CTA
+    "🔬&nbsp;&nbsp;Deep&nbsp;analysis&nbsp;by&nbsp;"
+    "<b><a href='https://t.me/ZeroPingX_bot'>ZeroPing</a></b>"
+    "&nbsp;—&nbsp;our&nbsp;AI-powered&nbsp;pattern-recognition&nbsp;bot\n"
+    "🔼&nbsp;&nbsp;<b><a href='https://axiom.trade/@kmtz'>Quick&nbsp;trade&nbsp;on&nbsp;AXIOM!</a></b>&nbsp;🚀"
+)
+
+await bot.send_message(
+    TARGET_GROUP,
+    msg,
+    parse_mode="HTML",
+    link_preview=False
+)
         )
 
     except errors.FloodWaitError as e:
@@ -87,6 +103,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
