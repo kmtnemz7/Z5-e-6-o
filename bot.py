@@ -7,7 +7,7 @@ api_id = int(os.getenv("API_ID"))
 api_hash = os.getenv("API_HASH")
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
-SOURCE_GROUP = os.getenv("BACKEND_GROUP", "zeropingphane")
+SOURCE_GROUP = os.getenv("BACKEND_GROUP", "BACKENDZEROPINGxc_vy")
 TARGET_GROUP = os.getenv("FRONTEND_GROUP", "ZeroPingX")
 
 async def start_with_retry(client, bot_token, retries=3, base_delay=60):
@@ -58,5 +58,6 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
