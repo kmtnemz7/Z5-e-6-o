@@ -1,77 +1,73 @@
-import os
-import asyncio
-from telethon import TelegramClient, events
-from telethon.errors import FloodWaitError
+from telethon import events, errors
+import asyncio, re
 
-api_id = int(os.getenv("API_ID"))
-api_hash = os.getenv("API_HASH")
-BOT_TOKEN = os.getenv("BOT_TOKEN")
+SOURCE_GROUP  = "BACKENDZEROPINGxc_vy"   # where scraper forwards raw pings
+TARGET_GROUP  = "ZeroPingX"              # final public group or channel
 
-SOURCE_GROUP = os.getenv("BACKEND_GROUP", "BACKENDZEROPINGxc_vy")
-TARGET_GROUP = os.getenv("FRONTEND_GROUP", "ZeroPingX")
 
-async def start_with_retry(client, bot_token, retries=3, base_delay=60):
-    for attempt in range(retries):
-        try:
-            await client.start(bot_token=bot_token)
-            print("Bot started successfully")
-            return True
-        except FloodWaitError as e:
-            print(f"FloodWaitError: Waiting {e.seconds} seconds (attempt {attempt + 1}/{retries})")
-            await asyncio.sleep(e.seconds + 1)
-        except Exception as e:
-            print(f"Startup error: {e}")
-            if attempt < retries - 1:
-                await asyncio.sleep(base_delay)
-    print("Failed to start bot after retries")
-    return False
+def extract_fields(text: str):
+    """Return dict with all the values we care about."""
+    lines   = text.splitlines()
+    fields  = {
+        "token": "N/A", "name": "N/A", "usd": "N/A", "mc": "N/A",
+        "vol": "N/A",  "seen": "N/A", "dex": "N/A", "dex_paid": "N/A",
+        "holder": "N/A", "th": "N/A"
+    }
 
-bot = TelegramClient("zeroping_bot", api_id, api_hash)
+    for ln in lines:
+        ln = ln.strip()
+        if ln.startswith("💊"):
+            fields["token"] = ln[2:].strip()
+        elif ln.startswith("┌"):
+            fields["name"]  = ln[1:].strip()
+        elif ln.startswith("├USD:"):
+            fields["usd"]   = ln.split("USD:")[1].strip()
+        elif ln.startswith("├MC:"):
+            fields["mc"]    = ln.split("MC:")[1].strip()
+        elif ln.startswith("├Vol:"):
+            fields["vol"]   = ln.split("Vol:")[1].strip()
+        elif ln.startswith("├Seen:"):
+            fields["seen"]  = ln.split("Seen:")[1].strip()
+        elif ln.startswith("├Dex:"):
+            fields["dex"]   = ln.split("Dex:")[1].strip()
+        elif ln.startswith("├Dex Paid:"):
+            fields["dex_paid"] = ln.split("Dex Paid:")[1].strip()
+        elif ln.startswith("├Holder:"):
+            fields["holder"] = ln.split("Holder:")[1].strip()
+        elif ln.startswith("└TH:"):
+            fields["th"]     = ln.split("TH:")[1].strip()
 
-def mdv2_escape(text):
-    return re.sub(r'([_\*\[\]\(\)~`>#+=|{}.!\\\-])', r'\\\1', str(text))
+    return fields
+
 
 @bot.on(events.NewMessage(chats=SOURCE_GROUP))
-async def handle(event):
+async def relay_and_format(event):
+    """Read raw ping, format summary, forward to frontend group."""
     try:
-        msg = event.message
+        txt = event.message.raw_text or ""
+
+        f = extract_fields(txt)
+
+        formatted = (
+            f"{f['name']}\n"
+            f"Token: {f['token']}\n"
+            f"USD: {f['usd']}\n"
+            f"MC: {f['mc']}\n"
+            f"Volume: {f['vol']}\n"
+            f"Seen: {f['seen']}\n"
+            f"Dex: {f['dex']} | Paid: {f['dex_paid']}\n"
+            f"Holder: {f['holder']}\n"
+            f"Top Holders: {f['th']}"
+        )
 
         await bot.send_message(
-            TARGET_GROUP,
-            message=msg.raw_text or "",
-            file=msg.media if msg.media else None,
-            parse_mode="MarkdownV2",
+            entity=TARGET_GROUP,
+            message=formatted,          # plain text; no extra formatting
             link_preview=False
         )
 
-    except FloodWaitError as e:
+    except errors.FloodWaitError as e:
         await asyncio.sleep(e.seconds + 1)
-        await bot.send_message(
-            TARGET_GROUP,
-            message=msg.raw_text or "",
-            file=msg.media if msg.media else None,
-            parse_mode="MarkdownV2",
-            link_preview=False
-        )
-
-    except Exception as e:
-        print("❌ BOT FORWARD ERROR:", e)
-
-async def main():
-    if await start_with_retry(bot, BOT_TOKEN):
-        print(f"Listening to {SOURCE_GROUP}, sending to {TARGET_GROUP}")
-        await bot.run_until_disconnected()
-    else:
-        print("Bot failed to start")
-
-if __name__ == "__main__":
-    asyncio.run(main())
-
-
-
-
-
-
-
-
-
+        await relay_and_format(event)
+    except Exception as err:
+        print("❌ formatting bot error:", err)
