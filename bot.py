@@ -31,7 +31,7 @@ bot = TelegramClient("zeroping_bot", api_id, api_hash)
 def mdv2_escape(text):
     return re.sub(r'([_\*\[\]\(\)~`>#+=|{}.!\\\-])', r'\\\1', str(text))
 
-@@bot.on(events.NewMessage(chats=SOURCE_GROUP))
+@bot.on(events.NewMessage(chats=SOURCE_GROUP)
 async def handle(event):
     try:
         msg = event.message
@@ -66,6 +66,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
