@@ -24,11 +24,12 @@ async def handle(event):
     safe_entities = msg.entities or []
 
     await bot.send_message(
-        "zeropingphane",
+        "ZeroPingX",
         trimmed_text,
         formatting_entities=safe_entities
     )
 bot.run_until_disconnected()
+
 
 
 
