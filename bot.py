@@ -87,7 +87,6 @@ await bot.send_message(
     parse_mode="HTML",
     link_preview=False
 )
-        )
 
     except errors.FloodWaitError as e:
         await asyncio.sleep(e.seconds + 1)
@@ -103,6 +102,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
