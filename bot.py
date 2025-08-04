@@ -1,5 +1,6 @@
 import os, asyncio, re
 from telethon import TelegramClient, events, errors
+from html import escape
 
 # ── 1. Settings ────────────────────────────────
 api_id     = int(os.getenv("API_ID"))
@@ -47,34 +48,33 @@ async def relay_and_format(event):
 
         f = extract_fields(raw)
 
-        # escape every dynamic value for MarkdownV2
+        # HTML-escape any user/dynamic content
         for k in f:
-            f[k] = mdv2_escape(f[k])
+            f[k] = escape(f[k])
 
-        # hyperlinked, bold, emoji-rich summary
         msg = (
-            f"💊 *[{f['name']}](https://dexscreener.com/solana/{f['token']})*\n"
-            f"📬 CA: [`{f['token']}`](https://solscan.io/token/{f['token']})\n\n"
-            f"💵 *Price:* {f['usd']}\n"
-            f"📈 *MC:* {f['mc']}\n"
-            f"💧 *Vol:* {f['vol']}\n"
-            f"⏱️ *Seen:* {f['seen']}\n\n"
-            f"⚖️ *DEX:* [{f['dex']}](https://raydium.io) | Paid: {f['dex_paid']}\n"
-            f"👥 *Holder:* {f['holder']}\n"
-            f"🔝 *Top Holders:* {f['th']}\n\n"
-            f"*[🔼 Quick trade on AXIOM\\!](https://axiom.trade/@kmtz)*"
+            f"💊 <b><a href='https://dexscreener.com/solana/{f['token']}'>{f['name']}</a></b>\n"
+            f"📬 CA: <code><a href='https://solscan.io/token/{f['token']}'>{f['token']}</a></code>\n\n"
+            f"💵 <b>Price:</b> {f['usd']}\n"
+            f"📈 <b>MC:</b> {f['mc']}\n"
+            f"💧 <b>Vol:</b> {f['vol']}\n"
+            f"⏱️ <b>Seen:</b> {f['seen']}\n\n"
+            f"⚖️ <b>DEX:</b> <a href='https://raydium.io'>{f['dex']}</a> | Paid: {f['dex_paid']}\n"
+            f"👥 <b>Holder:</b> {f['holder']}\n"
+            f"🔝 <b>Top Holders:</b> {f['th']}\n\n"
+            f"<b><a href='https://axiom.trade/@kmtz'>🔼 Quick trade on AXIOM!</a></b>"
         )
 
         await bot.send_message(
             TARGET_GROUP,
             msg,
-            parse_mode="MarkdownV2",
-            link_preview=False
+            parse_mode="HTML",
+            link_preview=False      # still hides Solscan cards
         )
 
     except errors.FloodWaitError as e:
         await asyncio.sleep(e.seconds + 1)
-        await relay_and_format(event)
+        await relay_and_format(event)      # retry once
     except Exception as err:
         print("❌ BOT FORWARD ERROR:", err)
 
@@ -86,4 +86,5 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
