@@ -5,7 +5,7 @@ api_id = int(os.getenv("API_ID"))
 api_hash = os.getenv("API_HASH")
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
-SOURCE_GROUP = os.getenv("BACKEND_GROUP", "zeropingphan")
+SOURCE_GROUP = os.getenv("BACKEND_GROUP", "zeropingphane")
 TARGET_GROUP = os.getenv("FRONTEND_GROUP", "ZeroPingX")
 
 # Init bot client
@@ -29,6 +29,7 @@ async def handle(event):
         formatting_entities=safe_entities
     )
 bot.run_until_disconnected()
+
 
 
 
