@@ -5,29 +5,18 @@ api_id = int(os.getenv("API_ID"))
 api_hash = os.getenv("API_HASH")
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
-SOURCE_GROUP = os.getenv("BACKEND_GROUP", "zeropingphane")
+SOURCE_GROUP = os.getenv("BACKEND_GROUP", "zeropingphane")  # Fixed to zeropingphan
 TARGET_GROUP = os.getenv("FRONTEND_GROUP", "ZeroPingX")
 
 # Init bot client
 bot = TelegramClient("zeroping_bot", api_id, api_hash).start(bot_token=BOT_TOKEN)
 
-@bot.on(events.NewMessage(chats="zeropingphane"))
+@bot.on(events.NewMessage(chats=SOURCE_GROUP))  # Use SOURCE_GROUP
 async def handle(event):
     msg = event.message
-    if not msg or not msg.text:
-        return
+    # Forward all messages, preserving all attributes (text, media, formatting)
+    await bot.forward_messages(TARGET_GROUP, msg)
 
-    full_text = msg.text
-    trimmed_text = full_text.strip()
-
-    # Keep all formatting entities safely
-    safe_entities = msg.entities or []
-
-    await bot.send_message(
-        "ZeroPingX",
-        trimmed_text,
-        formatting_entities=safe_entities
-    )
 bot.run_until_disconnected()
 
 
