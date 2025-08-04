@@ -28,15 +28,20 @@ async def start_with_retry(client, bot_token, retries=3, base_delay=60):
 
 bot = TelegramClient("zeroping_bot", api_id, api_hash)
 
-@bot.on(events.NewMessage(chats=SOURCE_GROUP))
+def mdv2_escape(text):
+    return re.sub(r'([_\*\[\]\(\)~`>#+=|{}.!\\\-])', r'\\\1', str(text))
+
+@@bot.on(events.NewMessage(chats=SOURCE_GROUP))
 async def handle(event):
     try:
         msg = event.message
+
         await bot.send_message(
             TARGET_GROUP,
             message=msg.raw_text or "",
             file=msg.media if msg.media else None,
-            parse_mode="MarkdownV2"
+            parse_mode="MarkdownV2",
+            link_preview=False
         )
 
     except FloodWaitError as e:
@@ -45,7 +50,8 @@ async def handle(event):
             TARGET_GROUP,
             message=msg.raw_text or "",
             file=msg.media if msg.media else None,
-            parse_mode="MarkdownV2"
+            parse_mode="MarkdownV2",
+            link_preview=False
         )
 
     except Exception as e:
@@ -60,6 +66,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
