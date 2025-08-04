@@ -14,19 +14,19 @@ bot = TelegramClient("zeroping_bot", api_id, api_hash).start(bot_token=BOT_TOKEN
 def parse_phanes_message(text):
     if not text:
         return None, []
-    # Extract variables with general regex
+    # Extract variables with regex
     token_match = re.search(r'\*\*(.*?)\*\* \((.*?)\) \((.*?)\)', text)
     contract_match = re.search(r'├ ([1-9A-HJ-NP-Za-km-z]{42,44})', text)  # Any Solana address
     chain_match = re.search(r'└ #(\w+)', text)
     platform_match = re.search(r'\((Raydium)\)', text)
     age_match = re.search(r'🌱(\d+h)', text)
-    views_match = re.search(r'👁️([\d.]+K)', text)
+    views_match = re.search(r'👁️([\d.]+K|\d+)', text)
     usd_match = re.search(r'USD:\s+\$([\d.₄]+)\s*\((.*?)\)', text)
     mc_match = re.search(r'MC:\s+\$(.*?)\n', text)
     vol_match = re.search(r'Vol:\s+\$(.*?)\n', text)
     lp_match = re.search(r'LP:\s+\$(.*?)\n', text)
-    supply_match = re.search(r'Sup:\s+([\d.M/]+)', text)
-    one_hour_match = re.search(r'1H:\s+\+([\d.]+)%.*?🅑 (\d+) Ⓢ (\d+)', text)
+    supply_match = re.search(r'Sup:\s+([\d.MB/]+)', text)
+    one_hour_match = re.search(r'1H:\s+([-+]?[\d.]+)%.*?🅑 (\d+) Ⓢ (\d+)', text)
     ath_match = re.search(r'ATH:\s+\$(.*?)\s*\((.*?)\)', text)
     x_link_match = re.search(r'𝕏 \((.*?)\)', text)
     freshies_match = re.search(r'Freshies:\s+([\d.]+%)\s+1D\s*\|\s*([\d.]+%)\s+7D', text)
@@ -62,7 +62,7 @@ def parse_phanes_message(text):
         f"Contract: {contract}\n"
         f"Market Cap: ${mc} | Price: ${usd_price} ({price_change}) | Volume: ${vol}\n"
         f"Liquidity: ${lp} | Supply: {supply} | Age: {age}\n"
-        f"1H Change: +{one_hour}% ({buys} Buys, {sells} Sells) | ATH: ${ath}\n"
+        f"1H Change: {one_hour}% ({buys} Buys, {sells} Sells) | ATH: ${ath}\n"
         f"Links: [X]({x_link})\n"
         f"Security: Freshies {freshies}, Top 10 Holders {top10}, Dex Paid {dex_paid}"
     )
@@ -72,7 +72,7 @@ def parse_phanes_message(text):
 async def handle(event):
     try:
         msg = event.message
-        # Detect Phanes messages (by content or sender)
+        # Detect Phanes messages
         if msg.text and ("**" in msg.text or "📊 Token Stats" in msg.text):
             custom_message, entities = parse_phanes_message(msg.text)
             await bot.send_message(
