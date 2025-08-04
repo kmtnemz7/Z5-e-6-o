@@ -55,10 +55,10 @@ async def relay_and_format(event):
         msg = (
             f"💊 <b><a href='https://dexscreener.com/solana/{f['token']}'>{f['name']}</a></b>\n"
             f"└ CA: <code><a href='https://solscan.io/token/{f['token']}'>{f['token']}</a></code>\n  |\n"
-            f"💵 <b>Price:</b> {f['usd']}\n"
-            f"📈 <b>MC:</b> {f['mc']}\n"
-            f"💧 <b>Vol:</b> {f['vol']}\n"
-            f"⏱️ <b>Seen:</b> {f['seen']}\n  |\n"
+            f"💵 <b>Price:</b>    {f['usd']}\n"
+            f"📈 <b>MC:</b>      {f['mc']}\n"
+            f"💧 <b>Vol:</b>      {f['vol']}\n"
+            f"⏱️ <b>Seen:</b>     {f['seen']}\n  |\n"
             f"⚖️ <b>DEX:</b> <a href='https://raydium.io'>{f['dex']}</a> | Paid: {f['dex_paid']}\n"
             f"👥 <b>Holder:</b> {f['holder']}\n"
             f"🔝 <b>Top Holders:</b> {f['th']}\n\n\n"
@@ -87,6 +87,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
