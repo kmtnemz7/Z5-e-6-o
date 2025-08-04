@@ -1,4 +1,4 @@
-mport os
+import os
 import asyncio
 from telethon import TelegramClient, events
 from telethon.errors import FloodWaitError
@@ -66,3 +66,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
