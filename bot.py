@@ -32,21 +32,20 @@ bot = TelegramClient("zeroping_bot", api_id, api_hash)
 async def handle(event):
     try:
         msg = event.message
-
         await bot.send_message(
             TARGET_GROUP,
-            message=msg.text or msg.raw_text or "",
+            message=msg.raw_text or "",
             file=msg.media if msg.media else None,
-            formatting_entities=msg.entities if msg.entities else None
+            parse_mode="MarkdownV2"
         )
 
     except FloodWaitError as e:
         await asyncio.sleep(e.seconds + 1)
         await bot.send_message(
             TARGET_GROUP,
-            message=msg.text or msg.raw_text or "",
+            message=msg.raw_text or "",
             file=msg.media if msg.media else None,
-            formatting_entities=msg.entities if msg.entities else None
+            parse_mode="MarkdownV2"
         )
 
     except Exception as e:
@@ -61,6 +60,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
