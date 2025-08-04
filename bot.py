@@ -62,7 +62,7 @@ async def relay_and_format(event):
             f"⚖️ *DEX:* [{f['dex']}](https://raydium.io) | Paid: {f['dex_paid']}\n"
             f"👥 *Holder:* {f['holder']}\n"
             f"🔝 *Top Holders:* {f['th']}\n\n"
-            f"*[[🔼 Quick trade on AXIOM\\!]](https://axiom.trade/@kmtz)*"
+            f"*[🔼 Quick trade on AXIOM\\!](https://axiom.trade/@kmtz)*"
         )
 
         await bot.send_message(
@@ -86,3 +86,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
