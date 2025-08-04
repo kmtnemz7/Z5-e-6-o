@@ -39,6 +39,8 @@ def extract_fields(text: str):
     return f
 
 # ── 5. Handler ────────────────────────────────
+from html import escape as h  # std-lib
+
 @bot.on(events.NewMessage(chats=SOURCE_GROUP))
 async def relay_and_format(event):
     try:
@@ -46,53 +48,53 @@ async def relay_and_format(event):
         if not raw:
             return
 
-        f = extract_fields(raw)
-for k in f:                          # HTML-escape dynamic text
-    f[k] = h(f[k])
+        f = extract_fields(raw)          # dict of values
 
-msg = (
-    # Header (DexScreener link)
-    f"💊&nbsp;&nbsp;<b><a href='https://dexscreener.com/solana/{f['token']}'>{f['name']}</a></b>\n"
+        # HTML-escape dynamic fields
+        for k in f:
+            f[k] = h(f[k])
 
-    # Contract
-    f"╰─🧬&nbsp;CA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→&nbsp;"
-    f"<code><a href='https://solscan.io/token/{f['token']}'>{f['token']}</a></code>\n"
-    f"&nbsp;&nbsp;&nbsp;│\n"
+        msg = (
+            # Header
+            f"💊  <b><a href='https://dexscreener.com/solana/{f['token']}'>{f['name']}</a></b>\n"
 
-    # Core stats (one per line, vertically aligned via non-breaking spaces)
-    f"&nbsp;&nbsp;&nbsp;💵&nbsp;Price&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→&nbsp;{f['usd']}\n"
-    f"&nbsp;&nbsp;&nbsp;📈&nbsp;MC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→&nbsp;{f['mc']}\n"
-    f"&nbsp;&nbsp;&nbsp;💧&nbsp;Volume&nbsp;&nbsp;&nbsp;→&nbsp;{f['vol']}\n"
-    f"&nbsp;&nbsp;&nbsp;⏱️&nbsp;&nbsp;Last&nbsp;Seen&nbsp;→&nbsp;{f['seen']}\n"
-    f"&nbsp;&nbsp;&nbsp;│\n"
+            # Contract
+            f"╰─🧬 CA           → "
+            f"<code><a href='https://solscan.io/token/{f['token']}'>{f['token']}</a></code>\n"
+            f"   │\n"
 
-    # Liquidity / holders
-    f"&nbsp;&nbsp;&nbsp;⚖️&nbsp;DEX&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→&nbsp;"
-    f"<a href='https://raydium.io'>{f['dex']}</a>&nbsp;&nbsp;|&nbsp;Paid&nbsp;{f['dex_paid']}\n"
-    f"&nbsp;&nbsp;&nbsp;👥&nbsp;Holders&nbsp;&nbsp;&nbsp;→&nbsp;{f['holder']}\n"
-    f"&nbsp;&nbsp;&nbsp;🔝&nbsp;TH&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→&nbsp;{f['th']}\n"
+            # Stats (aligned with NBSPs)
+            f"   💵 Price        → {f['usd']}\n"
+            f"   📈 MC           → {f['mc']}\n"
+            f"   💧 Volume       → {f['vol']}\n"
+            f"   ⏱️  Last Seen   → {f['seen']}\n"
+            f"   │\n"
 
-    "────────────────────────────────────────────────────────\n"
+            # DEX & Holders
+            f"   ⚖️ DEX           → <a href='https://raydium.io'>{f['dex']}</a>  |  Paid {f['dex_paid']}\n"
+            f"   👥 Holders      → {f['holder']}\n"
+            f"   🔝 TH            → {f['th']}\n"
 
-    # Brand line & CTA
-    "🔬&nbsp;&nbsp;Deep&nbsp;analysis&nbsp;by&nbsp;"
-    "<b><a href='https://t.me/ZeroPingX_bot'>ZeroPing</a></b>"
-    "&nbsp;—&nbsp;our&nbsp;AI-powered&nbsp;pattern-recognition&nbsp;bot\n"
-    "🔼&nbsp;&nbsp;<b><a href='https://axiom.trade/@kmtz'>Quick&nbsp;trade&nbsp;on&nbsp;AXIOM!</a></b>&nbsp;🚀"
-)
+            "────────────────────────────────────────────────────────\n"
 
-await bot.send_message(
-    TARGET_GROUP,
-    msg,
-    parse_mode="HTML",
-    link_preview=False
-)
+            # Footer
+            "🔬  Deep analysis by <b><a href='https://t.me/ZeroPingX_bot'>ZeroPing</a></b> — our AI-powered pattern-recognition bot\n"
+            "🔼  <b><a href='https://axiom.trade/@kmtz'>Quick trade on AXIOM!</a></b> 🚀"
+        )
+
+        await bot.send_message(
+            TARGET_GROUP,
+            msg,
+            parse_mode="HTML",
+            link_preview=False
+        )
 
     except errors.FloodWaitError as e:
         await asyncio.sleep(e.seconds + 1)
-        await relay_and_format(event)      # retry once
+        await relay_and_format(event)   # retry
     except Exception as err:
         print("❌ BOT FORWARD ERROR:", err)
+
 
 # ── 6. Run ─────────────────────────────────────
 async def main():
@@ -102,6 +104,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
