@@ -55,7 +55,7 @@ async def relay_and_format(event):
             f[k] = h(f[k])
 
         msg = (
-    f"💊 <b><a href='https://dexscreener.com/solana/{f['token']}'>${f['name']}</a></b>     🔽\n"
+    f"💊 <b><a href='https://dexscreener.com/solana/{f['token']}'>{f['name']}</a></b>     🔽\n"
     f"└ CA: <code><a href='https://solscan.io/token/{f['token']}'>{f['token']}</a></code>\n\n"
 
     # ── vertically aligned stats block ────────────
@@ -95,6 +95,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
