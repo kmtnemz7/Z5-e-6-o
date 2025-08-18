@@ -63,15 +63,15 @@ async def relay_and_format(event):
     f"💵 Price: {f['usd']}\n"
     f"📈 MC: {f['mc']}\n"
     f"💧 Vol: {f['vol']}\n"
-    f"⏱️ Seen: {f['seen']}"
+    f"⏱️ Scanned: {f['seen']}"
     f"\n  |\n"
     # ──────────────────────────────────────────────
 
     f"⚖️ <b>DEX:</b> <a href='https://raydium.io'>{f['dex']}</a> | Paid: {f['dex_paid']}\n"
     f"👥 <b>Holder:</b> {f['holder']}\n"
     f"🔝 <b>TH:</b> {f['th']}\n\n"
-    f"🔬 Deep analysis by <a href='https://t.me/ZeroPingX_bot'>ZeroPing</a> — our AI powered pattern recognition bot.\n\n"
-    f"<b><a href='https://axiom.trade/@kmtz77'>🔼 Quick trade on AXIOM!</a></b>"
+    f"🔬 Deep analysis by <a href='https://t.me/ZeroPingX_bot'>ZeroPing</a> → our bot focused on clean pattern detection.\n\n"
+    f"<b><a href='https://axiom.trade/@zeroping'>🔼 Quick trade on AXIOM!</a></b>"
 )
         await bot.send_message(
             TARGET_GROUP,
@@ -95,6 +95,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
